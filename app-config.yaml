@@ -1,23 +1,15 @@
 app:
   title: DevPortal
-  baseUrl: https://devportal.197.140.32.144.sslip.io:30443
-  packages: all
-  extensions:
-    - page:catalog:
-        config:
-          path: /
-
-organization:
-  name: DevPortal
+  baseUrl: https://197.140.32.65:30443
 
 backend:
-  baseUrl: https://devportal.197.140.32.144.sslip.io:30443
+  baseUrl: https://197.140.32.65:30443
   listen:
     port: 7007
   csp:
-    connect-src: ["'self'", 'http:', 'https:']
+    connect-src: ["self", 'http:', 'https:']
   cors:
-    origin: https://devportal.197.140.32.144.sslip.io:30443
+    origin: https://197.140.32.65:30443
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
   database:
@@ -27,57 +19,33 @@ backend:
       port: ${POSTGRES_PORT}
       user: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
-  actions:
-    pluginSources:
-      - auth
-      - catalog
-      - scaffolder
-
-integrations:
-  github:
-    - host: github.com
-      token: ${GITHUB_TOKEN}
-
-proxy: {}
-
-techdocs:
-  builder: 'local'
-  generator:
-    runIn: 'local'
-  publisher:
-    type: 'local'
 
 auth:
   environment: development
+  session:
+    secret: my-backstage-session-secret
   providers:
     guest:
       dangerouslyAllowOutsideDevelopment: true
-
-scaffolder: {}
+    oidc:
+      development:
+        metadataUrl: https://197.140.32.151:30900/realms/devportal/.well-known/openid-configuration
+        clientId: backstage
+        clientSecret: YbwffCiztqtx3AuRQbZfMPFJalg3SmTC
+        prompt: auto
+        callbackUrl: https://197.140.32.65:30443/api/auth/oidc/handler/frame
+        signIn:
+          resolvers:
+            - resolver: emailLocalPartMatchingUserEntityName
 
 catalog:
-  import:
-    entityFilename: catalog-info.yaml
-    pullRequestBranchName: backstage-integration
-  rules:
-    - allow: [Component, System, API, Resource, Location, User, Group, Template]
-  locations:
-    - type: url
-      target: https://github.com/Abderraoufzekkour/idp-openstack/blob/main/backstage/catalog/all.yaml
-      rules:
-        - allow: [Component, System, API, Resource, Location, User, Group, Template]
-
-kubernetes:
-  serviceLocatorMethod:
-    type: multiTenant
-  clusterLocatorMethods:
-    - type: config
-      clusters:
-        - name: devportal-cluster
-          url: https://197.140.32.144:6443
-          authProvider: serviceAccount
-          skipTLSVerify: true
-          serviceAccountToken: ${K8S_SA_TOKEN}
-
-permission:
-  enabled: false
+  providers:
+    github:
+      providerId:
+        organization: devportal-labs
+        catalogPath: /catalog-info.yaml
+        filters:
+          branch: main
+        schedule:
+          frequency: { minutes: 1 }
+          timeout: { minutes: 3 }
