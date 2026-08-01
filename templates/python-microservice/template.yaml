@@ -1,0 +1,56 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: python-microservice-template
+  title: Python Microservice on OpenStack
+  description: Creates a standard Python microservice pre-configured for the OpenStack DevPortal
+  tags:
+    - python
+    - openstack
+    - scaffolder
+spec:
+  owner: platform-engineers
+  type: service
+
+  parameters:
+    - title: Provide component details
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          title: Component Name
+          type: string
+          description: Unique name of the service (e.g. billing-service)
+          ui:autofocus: true
+          ui:options:
+            help: Use lowercase letters and hyphens only
+        description:
+          title: Description
+          type: string
+          description: Brief description of what this microservice does
+        owner:
+          title: Owner
+          type: string
+          default: platform-engineers
+          description: The owner team of this component
+
+  steps:
+    - id: log-message
+      name: Log Template Parameters
+      action: debug:log
+      input:
+        message: 'Creating service ${parameters.name} owned by ${parameters.owner}'
+
+    - id: register
+      name: Register Component to Catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: https://github.com/Abderraoufzekkour/idp-openstack
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    links:
+      - title: Open Catalog Entity
+        url: 'https://197.140.32.65:30443/catalog'
