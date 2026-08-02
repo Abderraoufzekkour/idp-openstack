@@ -41,16 +41,37 @@ spec:
       name: Log Template Parameters
       action: debug:log
       input:
-        message: 'Creating service ${parameters.name} owned by ${parameters.owner}'
+        message: 'Creating service ${{ parameters.name }} owned by ${{ parameters.owner }}'
+
+    - id: fetch-base
+      name: Fetch Base Skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+
+    - id: publish
+      name: Publish to GitHub
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: ${{ parameters.description }}
+        repoUrl: 'github.com?repo=${{ parameters.name }}&owner=Abderraoufzekkour'
 
     - id: register
       name: Register Component to Catalog
       action: catalog:register
       input:
-        repoContentsUrl: https://github.com/Abderraoufzekkour/idp-openstack
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
         catalogInfoPath: '/catalog-info.yaml'
 
   output:
     links:
-      - title: Open Catalog Entity
-        url: 'https://197.140.32.65:30443/catalog'
+      - title: Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: Open in Catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
