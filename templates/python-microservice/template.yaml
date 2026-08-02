@@ -67,3 +67,11 @@ spec:
       input:
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
         catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    entityRef: ${{ steps['register'].output.entityRef }}
+    links:
+      - title: Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: Open in Catalog
+        url: 'https://197.140.32.65:30443/catalog'
