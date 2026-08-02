@@ -4,4 +4,4 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello from your OpenStack microservice!"}
+    return {"message": "Hello from your GitOps microservice!"}
