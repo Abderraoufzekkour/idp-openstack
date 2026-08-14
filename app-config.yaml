@@ -1,51 +1,128 @@
 app:
+  baseUrl: https://devportal.197.140.32.144.sslip.io
+  extensions:
+  - page:catalog:
+      config:
+        path: /
+  - entity-content:kubernetes/kubernetes
+  - entity-content:argocd/argocd
   title: DevPortal
-  baseUrl: https://197.140.32.65:30443
-
-backend:
-  baseUrl: https://197.140.32.65:30443
-  listen:
-    port: 7007
-  csp:
-    connect-src: ["self", 'http:', 'https:']
-  cors:
-    origin: https://197.140.32.65:30443
-    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
-    credentials: true
-  database:
-    client: pg
-    connection:
-      host: ${POSTGRES_HOST}
-      port: ${POSTGRES_PORT}
-      user: ${POSTGRES_USER}
-      password: ${POSTGRES_PASSWORD}
 
 auth:
   environment: development
-  session:
-    secret: my-backstage-session-secret
   providers:
     guest:
       dangerouslyAllowOutsideDevelopment: true
     oidc:
       development:
-        metadataUrl: https://197.140.32.151:30900/realms/devportal/.well-known/openid-configuration
+        callbackUrl: https://197.140.32.65:30443/api/auth/oidc/handler/frame
         clientId: backstage
         clientSecret: YbwffCiztqtx3AuRQbZfMPFJalg3SmTC
+        metadataUrl: https://197.140.32.151:30900/realms/DevPortal/.well-known/openid-configuration
         prompt: auto
-        callbackUrl: https://197.140.32.65:30443/api/auth/oidc/handler/frame
         signIn:
           resolvers:
-            - resolver: emailLocalPartMatchingUserEntityName
+          - resolver: emailLocalPartMatchingUserEntityName
+
+session:
+  secret: my-backstage-session-secret
+
+backend:
+  baseUrl: https://devportal.197.140.32.144.sslip.io
+  cors:
+    credentials: true
+    methods:
+      - GET
+      - HEAD
+      - PATCH
+      - POST
+      - PUT
+      - DELETE
+    origin: https://devportal.197.140.32.144.sslip.io
+  csp:
+    connect-src:
+      - "'self'"
+      - 'http:'
+      - 'https:'
+  database:
+    client: pg
+    connection:
+      host: ${POSTGRES_HOST}
+      password: ${POSTGRES_PASSWORD}
+      port: ${POSTGRES_PORT}
+      user: ${POSTGRES_USER}
+  listen:
+    port: 7007
 
 catalog:
+  locations:
+    - type: url
+      target: https://github.com/devportal-labs/idp-openstack/blob/main/org.yaml
+      rules:
+        - allow: [Group, System, User]
   providers:
     github:
-      providerId:
-        organization: devportal-labs
+      devportalLabs:
         catalogPath: /catalog-info.yaml
         filters:
           branch: main
+          repository: .*
+        organization: Abderraoufzekkour
         schedule:
-          frequency: { minutes: 1 }
-          timeout: { minutes: 3 }
+          frequency:
+            minutes: 5
+          timeout:
+            minutes: 3
+    githubOrg:
+      githubUrl: https://github.com/Abderraoufzekkour
+      id: devportalLabsOrg
+      schedule:
+        frequency:
+          minutes: 10
+        timeout:
+          minutes: 3
+  rules:
+  - allow:
+    - Component
+    - System
+    - API
+    - Resource
+    - Location
+    - User
+    - Group
+    - Template
+
+integrations:
+  github:
+  - host: github.com
+    token: ${GITHUB_TOKEN}
+
+notifications:
+  enabled: false
+
+organization:
+  name: DevPortal
+
+permission:
+  enabled: false
+
+kubernetes:
+  serviceLocatorMethod:
+    type: multiTenant
+  clusterLocatorMethods:
+    - type: config
+      clusters:
+        - url: https://10.96.0.1
+          name: local-cluster
+          authProvider: serviceAccount
+          skipTLSVerify: true
+          skipMetricsLookup: true
+
+argocd:
+  appLocatorMethods:
+    - type: config
+      instances:
+        - name: argoInstance1
+          url: https://197.140.32.65:30808
+          username: ${ARGOCD_USERNAME}
+          password: ${ARGOCD_PASSWORD}
