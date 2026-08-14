@@ -3,6 +3,7 @@ kind: Composition
 metadata:
   name: xopenstackinstances.compute.idp.io
 spec:
+  mode: Resources
   compositeTypeRef:
     apiVersion: compute.idp.io/v1alpha1
     kind: XOpenStackInstance
