@@ -1,0 +1,35 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xopenstackinstances.compute.idp.io
+spec:
+  group: compute.idp.io
+  names:
+    kind: XOpenStackInstance
+    plural: xopenstackinstances
+  claimNames:
+    kind: OpenStackInstance
+    plural: openstackinstances
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                parameters:
+                  type: object
+                  required:
+                    - instanceName
+                  properties:
+                    instanceName:
+                      type: string
+                    flavorName:
+                      type: string
+                      default: m1.small
+                  required:
+                    - instanceName
