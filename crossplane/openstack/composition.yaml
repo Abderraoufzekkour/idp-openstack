@@ -3,27 +3,35 @@ kind: Composition
 metadata:
   name: xopenstackinstances.compute.idp.io
 spec:
-  mode: Resources
   compositeTypeRef:
     apiVersion: compute.idp.io/v1alpha1
     kind: XOpenStackInstance
-  resources:
-    - name: openstack-vm
-      base:
-        apiVersion: compute.openstack.crossplane.io/v1alpha1
-        kind: Instance
-        spec:
-          forProvider:
-            flavorName: m1.small
-            imageName: ubuntu-22.04
-            networks:
-              - name: public
-            securityGroups:
-              - name: default
-          providerConfigRef:
-            name: openstack-provider
-      patches:
-        - fromFieldPath: "spec.parameters.instanceName"
-          toFieldPath: "metadata.name"
-        - fromFieldPath: "spec.parameters.flavorName"
-          toFieldPath: "spec.forProvider.flavorName"
+  pipeline:
+    - step: patch-and-transform
+      functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - name: openstack-vm
+            base:
+              apiVersion: compute.openstack.crossplane.io/v1alpha1
+              kind: Instance
+              spec:
+                forProvider:
+                  flavorName: m1.small
+                  imageName: ubuntu-22.04
+                  networks:
+                    - name: public
+                  securityGroups:
+                    - name: default
+                providerConfigRef:
+                  name: openstack-provider
+            patches:
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.instanceName"
+                toFieldPath: "metadata.name"
+              - type: FromCompositeFieldPath
+                fromFieldPath: "spec.parameters.flavorName"
+                toFieldPath: "spec.forProvider.flavorName"
