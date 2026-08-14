@@ -6,8 +6,6 @@ spec:
   compositeTypeRef:
     apiVersion: compute.idp.io/v1alpha1
     kind: XOpenStackInstance
-  providerConfigRef:
-    name: openstack-provider
   resources:
     - name: openstack-vm
       base:
@@ -21,6 +19,8 @@ spec:
               - name: public
             securityGroups:
               - name: default
+          providerConfigRef:
+            name: openstack-provider
       patches:
         - fromFieldPath: "spec.parameters.instanceName"
           toFieldPath: "metadata.name"
