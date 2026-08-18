@@ -1,0 +1,19 @@
+
+apiVersion: compute.idp.io/v1alpha1
+
+kind: OpenStackInstance
+
+metadata:
+
+  name: vm-test-05
+
+  namespace: default
+
+spec:
+
+  parameters:
+
+    instanceName: "vm-test-05"
+
+    flavorName: "m1.small"
+
