@@ -1,10 +1,10 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: god-tier-fastapi-postgres
-  title: God-Tier Full-Stack App (FastAPI + Postgres)
-  description: Automatically provisions a Python GitHub repo, a K8s Namespace, and a PostgreSQL database in one click!
-  tags: ['python', 'fastapi', 'postgres', 'crossplane', 'god-tier']
+  name: full-stack-fastapi-postgres
+  title: Enterprise Full-Stack App (FastAPI + Postgres)
+  description: Provisions a production-ready Python FastAPI repository, K8s Namespace, and a PostgreSQL database.
+  tags: ['python', 'fastapi', 'postgres', 'crossplane', 'enterprise']
 spec:
   owner: platform-team
   type: service
@@ -51,8 +51,7 @@ spec:
       name: Publishing to GitHub
       action: publish:github
       input:
-        allowedHosts: ['github.com']
-        description: Full-Stack App for ${{ parameters.component_id }}
+        description: Enterprise Full-Stack App for ${{ parameters.component_id }}
         repoUrl: github.com?repo=${{ parameters.component_id }}&owner=devportal-labs
 
     - id: register
