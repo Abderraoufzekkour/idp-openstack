@@ -1,0 +1,71 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: god-tier-fastapi-postgres
+  title: God-Tier Full-Stack App (FastAPI + Postgres)
+  description: Automatically provisions a Python GitHub repo, a K8s Namespace, and a PostgreSQL database in one click!
+  tags: ['python', 'fastapi', 'postgres', 'crossplane', 'god-tier']
+spec:
+  owner: platform-team
+  type: service
+  
+  parameters:
+    - title: Application Details
+      required:
+        - component_id
+      properties:
+        component_id:
+          title: App Name
+          type: string
+          description: Unique name of your new microservice (e.g., payment-api)
+    - title: Database Requirements
+      required:
+        - db_size
+      properties:
+        db_size:
+          title: Postgres Database Size
+          type: string
+          enum: ['small (20GB)', 'medium (50GB)', 'large (100GB)']
+          default: 'small (20GB)'
+
+  steps:
+    - id: fetch-python-code
+      name: Generating Python API Code
+      action: fetch:template
+      input:
+        url: ./skeletons/fastapi
+        values:
+          component_id: ${{ parameters.component_id }}
+
+    - id: fetch-crossplane-db
+      name: Generating Crossplane Database Infra
+      action: fetch:template
+      input:
+        url: ./skeletons/postgres-crossplane
+        targetPath: ./k8s-manifests
+        values:
+          component_id: ${{ parameters.component_id }}
+          db_size: ${{ parameters.db_size }}
+
+    - id: publish-github
+      name: Publishing to GitHub
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: Full-Stack App for ${{ parameters.component_id }}
+        repoUrl: github.com?repo=${{ parameters.component_id }}&owner=devportal-labs
+
+    - id: register
+      name: Registering in DevPortal Catalog
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish-github'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    links:
+      - title: View Source Code & Infra
+        url: ${{ steps['publish-github'].output.remoteUrl }}
+      - title: Open App in DevPortal
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
