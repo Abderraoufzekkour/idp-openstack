@@ -136,3 +136,11 @@ argocd:
           url: https://197.140.32.65:30808
           username: ${ARGOCD_USERNAME}
           password: ${ARGOCD_PASSWORD}
+
+proxy:
+  '/argocd/api':
+    target: https://197.140.32.65:30808/api/v1/
+    changeOrigin: true
+    secure: false
+    headers:
+      Authorization: Bearer ${ARGOCD_AUTH_TOKEN}

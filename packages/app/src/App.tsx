@@ -7,6 +7,7 @@ import userSettingsPlugin from '@backstage/plugin-user-settings/alpha';
 import techdocsPlugin from '@backstage/plugin-techdocs/alpha';
 import orgPlugin from '@backstage/plugin-org/alpha';
 import kubernetesPlugin from '@backstage/plugin-kubernetes/alpha';
+import argocdPlugin from '@roadiehq/backstage-plugin-argo-cd/alpha';
 import { navModule } from './modules/nav';
 import { SignInPageBlueprint } from '@backstage/plugin-app-react';
 import { SignInPage } from '@backstage/core-components';
@@ -21,12 +22,10 @@ import {
 } from '@backstage/core-plugin-api';
 import { OAuth2 } from '@backstage/core-app-api';
 
-// 1. Create the Custom API Ref for Keycloak
 export const oidcAuthApiRef = createApiRef<any>({
   id: 'auth.oidc',
 });
 
-// 2. Register the API extension so the modern frontend knows how to handle the connection
 const oidcApiExtension = createApiExtension({
   factory: createApiFactory({
     api: oidcAuthApiRef,
@@ -50,12 +49,11 @@ const oidcApiExtension = createApiExtension({
   }),
 });
 
-// 3. Create the Custom Sign-In Page
 const signInPage = SignInPageBlueprint.make({
   params: {
     loader: async () => props => (
-      <SignInPage 
-        {...props} 
+      <SignInPage
+        {...props}
         providers={[
           'guest',
           {
@@ -64,19 +62,17 @@ const signInPage = SignInPageBlueprint.make({
             message: 'Sign in with your DevPortal account',
             apiRef: oidcAuthApiRef,
           },
-        ]} 
+        ]}
       />
     ),
   },
 });
 
-// 4. Bundle into a Frontend Module
 const customAuthModule = createFrontendModule({
   pluginId: 'app',
   extensions: [signInPage, oidcApiExtension],
 });
 
-// 5. Boot the app natively
 export default createApp({
   features: [
     catalogPlugin,
@@ -86,6 +82,7 @@ export default createApp({
     techdocsPlugin,
     orgPlugin,
     kubernetesPlugin,
+    argocdPlugin,
     navModule,
     customAuthModule,
   ].filter(Boolean),
