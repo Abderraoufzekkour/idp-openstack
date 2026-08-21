@@ -22,7 +22,7 @@ auth:
         prompt: auto
         signIn:
           resolvers:
-          - resolver: emailLocalPartMatchingUserEntityName
+            - resolver: emailLocalPartMatchingUserEntityName
 
 session:
   secret: my-backstage-session-secret
@@ -55,6 +55,16 @@ backend:
     port: 7007
 
 catalog:
+  rules:
+  - allow:
+    - Component
+    - System
+    - API
+    - Resource
+    - Location
+    - User
+    - Group
+    - Template
   locations:
     - type: url
       target: https://github.com/devportal-labs/idp-openstack/blob/main/org.yaml
@@ -81,16 +91,16 @@ catalog:
           minutes: 10
         timeout:
           minutes: 3
-  rules:
-  - allow:
-    - Component
-    - System
-    - API
-    - Resource
-    - Location
-    - User
-    - Group
-    - Template
+    keycloakOrg:
+      default:
+        baseUrl: https://197.140.32.151:30900
+        loginRealm: DevPortal
+        realm: DevPortal
+        clientId: backstage
+        clientSecret: YbwffCiztqtx3AuRQbZfMPFJalg3SmTC
+        schedule:
+          frequency: { minutes: 1 }
+          timeout: { minutes: 3 }
 
 integrations:
   github:
