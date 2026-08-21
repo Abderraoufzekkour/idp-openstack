@@ -1,0 +1,11 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.component_id | dump }}
+  description: Enterprise Full-Stack FastAPI microservice
+  annotations:
+    github.com/project-slug: devportal-labs/${{ values.component_id }}
+spec:
+  type: service
+  lifecycle: experimental
+  owner: platform-team
