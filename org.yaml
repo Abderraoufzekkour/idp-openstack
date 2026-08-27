@@ -1,7 +1,7 @@
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: platform-engineers
+  name: platform-team
   description: The core infrastructure and platform team
 spec:
   type: team
@@ -13,6 +13,6 @@ metadata:
   name: abderraouf
 spec:
   profile:
-    displayName: Abderraouf
-    email: YOUR_EMAIL@HERE.COM
-  memberOf: [platform-engineers]
+    displayName: Abderraouf Zekkour
+    email: abderraouf@example.com
+  memberOf: [platform-team]
