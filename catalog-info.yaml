@@ -1,13 +1,13 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: devportal
-  description: An example of a Backstage application.
-  # Example for optional annotations
-  # annotations:
-  #   github.com/project-slug: backstage/backstage
-  #   backstage.io/techdocs-ref: dir:.
+  name: idp-openstack
+  description: Internal Developer Platform on OpenStack - Backstage, ArgoCD, Crossplane, Vault, Kyverno, Calico
+  annotations:
+    github.com/project-slug: Abderraoufzekkour/idp-openstack
+    backstage.io/techdocs-ref: dir:.
+    backstage.io/kubernetes-id: idp-openstack
 spec:
-  type: website
-  owner: john@example.com
-  lifecycle: experimental
+  type: service
+  owner: group:default/platform-engineers
+  lifecycle: production
