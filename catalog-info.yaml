@@ -6,6 +6,7 @@ metadata:
   description: OpenStack Infrastructure for IDP
   annotations:
     backstage.io/techdocs-ref: dir:.
+    backstage.io/source-location: url:https://github.com/Abderraoufzekkour/idp-openstack/tree/main/
 spec:
   type: service
   lifecycle: production
