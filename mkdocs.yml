@@ -1,0 +1,5 @@
+site_name: 'idp-openstack'
+site_description: 'Documentation for IDP OpenStack Infrastructure'
+
+plugins:
+  - techdocs-core
