@@ -2,12 +2,11 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: idp-openstack
-  description: Internal Developer Platform on OpenStack - Backstage, ArgoCD, Crossplane, Vault, Kyverno, Calico
+  title: IDP OpenStack
+  description: OpenStack Infrastructure for IDP
   annotations:
-    github.com/project-slug: Abderraoufzekkour/idp-openstack
     backstage.io/techdocs-ref: dir:.
-    backstage.io/kubernetes-id: idp-openstack
 spec:
   type: service
-  owner: group:default/platform-engineers
   lifecycle: production
+  owner: user:default/guest
