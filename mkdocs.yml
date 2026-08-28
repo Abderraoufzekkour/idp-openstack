@@ -1,5 +1,8 @@
-site_name: 'idp-openstack'
-site_description: 'Documentation for IDP OpenStack Infrastructure'
-
+site_name: 'PlatformOne IDP'
+site_description: 'Enterprise Internal Developer Platform Documentation'
 plugins:
   - techdocs-core
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Deployment: deployment.md
