@@ -1,0 +1,8 @@
+site_name: 'FastAPI Microservice Docs'
+site_description: 'Documentation for this FastAPI service'
+
+plugins:
+  - techdocs-core
+
+nav:
+  - Home: index.md
