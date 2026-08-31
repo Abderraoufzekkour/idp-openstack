@@ -144,3 +144,8 @@ proxy:
     secure: false
     headers:
       Authorization: Bearer ${ARGOCD_AUTH_TOKEN}
+
+techdocs:
+  builder: 'local'
+  generator:
+    runIn: 'local'
