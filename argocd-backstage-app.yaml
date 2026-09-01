@@ -1,0 +1,254 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: devportal-backstage
+  namespace: argocd
+spec:
+  destination:
+    namespace: backstage
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: backstage
+    helm:
+      parameters:
+      - name: backstage.image.tag
+        value: 1.0.51
+      - name: backstage.extraEnvVars[0].name
+        value: POSTGRES_HOST
+      - name: backstage.extraEnvVars[0].value
+        value: devportal-postgresql
+      - name: backstage.extraEnvVars[1].name
+        value: POSTGRES_PORT
+      - name: backstage.extraEnvVars[2].name
+        value: POSTGRES_USER
+      - name: backstage.extraEnvVars[2].value
+        value: backstage
+      - name: backstage.extraEnvVars[3].name
+        value: NODE_TLS_REJECT_UNAUTHORIZED
+      - name: backstage.extraEnvVars[4].name
+        value: NODE_OPTIONS
+      - name: backstage.extraEnvVars[4].value
+        value: --no-node-snapshot
+      - forceString: true
+        name: backstage.extraEnvVars[1].value
+        value: "5432"
+      - forceString: true
+        name: backstage.extraEnvVars[3].value
+        value: "0"
+      - name: image.tag
+        value: 1.0.11
+      - forceString: true
+        name: backstage.extraEnvVars[5].name
+        value: NODE_ENV
+      - forceString: true
+        name: backstage.extraEnvVars[5].value
+        value: development
+      - name: imagePullSecrets[0].name
+        value: ghcr-secret
+      releaseName: devportal
+      values: |
+        image:
+          tag: 1.0.7
+      valuesObject:
+        backstage:
+          appConfig:
+            app:
+              baseUrl: https://197.140.32.65:30443
+              enableExperimentalRedirectFlow: true
+              extensions:
+              - page:catalog:
+                  config:
+                    path: /
+              - entity-content:kubernetes/kubernetes
+              - entity-content:argocd/argocd
+              title: DevPortal
+            argocd:
+              appLocatorMethods:
+              - instances:
+                - name: argoInstance1
+                  password: ${ARGOCD_PASSWORD}
+                  url: https://10.10.10.175:30808
+                  username: ${ARGOCD_USERNAME}
+                type: config
+            auth:
+              environment: development
+              providers:
+                guest:
+                  dangerouslyAllowOutsideDevelopment: true
+                oidc:
+                  development:
+                    callbackUrl: https://197.140.32.65:30443/api/auth/oidc/handler/frame
+                    clientId: backstage
+                    clientSecret: YbwffCiztqtx3AuRQbZfMPFJalg3SmTC
+                    metadataUrl: https://197.140.32.151:30900/realms/devportal/.well-known/openid-configuration
+                    prompt: auto
+                    signIn:
+                      resolvers:
+                      - resolver: emailLocalPartMatchingUserEntityName
+            session:
+              secret: my-backstage-session-secret
+            backend:
+              baseUrl: https://197.140.32.65:30443
+              cors:
+                credentials: true
+                methods:
+                - GET
+                - HEAD
+                - PATCH
+                - POST
+                - PUT
+                - DELETE
+                origin: https://197.140.32.65:30443
+              csp:
+                connect-src:
+                - '''self'''
+                - 'http:'
+                - 'https:'
+              database:
+                client: pg
+                connection:
+                  host: ${POSTGRES_HOST}
+                  password: ${POSTGRES_PASSWORD}
+                  port: ${POSTGRES_PORT}
+                  user: ${POSTGRES_USER}
+              https:
+                certificate:
+                  cert:
+                    $file: /etc/backstage/tls/tls.crt
+                  key:
+                    $file: /etc/backstage/tls/tls.key
+              listen:
+                port: 7007
+              reading:
+                allow:
+                - host: raw.githubusercontent.com
+                - host: github.com
+            catalog:
+              locations:
+              - rules:
+                - allow:
+                  - Group
+                  - System
+                  - User
+                target: https://github.com/devportal-labs/idp-openstack/blob/main/org.yaml
+                type: url
+              processingInterval:
+                minutes: 10
+              providers:
+                github:
+                  devportalLabs:
+                    catalogPath: /catalog-info.yaml
+                    filters:
+                      branch: main
+                      repository: .*
+                    organization: devportal-labs
+                    schedule:
+                      frequency:
+                        minutes: 5
+                      initialDelay:
+                        seconds: 30
+                      timeout:
+                        minutes: 3
+                githubOrg:
+                  githubUrl: https://github.com/devportal-labs
+                  id: devportalLabsOrg
+                  schedule:
+                    frequency:
+                      minutes: 10
+                      initialDelay:
+                        seconds: 45
+                      timeout:
+                        minutes: 3
+              rules:
+              - allow:
+                - Component
+                - System
+                - API
+                - Resource
+                - Location
+                - User
+                - Group
+                - Template
+            enableExperimentalRedirectFlow: true
+            integrations:
+              github:
+              - host: github.com
+                token: ${GITHUB_TOKEN}
+            kubernetes:
+              clusterLocatorMethods:
+              - clusters:
+                - authProvider: serviceAccount
+                  name: local-cluster
+                  skipMetricsLookup: true
+                  skipTLSVerify: true
+                  url: https://10.96.0.1
+                type: config
+              serviceLocatorMethod:
+                type: multiTenant
+            notifications:
+              enabled: false
+            organization:
+              name: DevPortal
+            permission:
+              enabled: false
+          extraEnvVars:
+          - name: APP_CONFIG_techdocs_builder
+            value: 'local'
+          - name: APP_CONFIG_techdocs_generator_runIn
+            value: 'local'
+          - name: POSTGRES_HOST
+            value: devportal-postgresql
+          - name: POSTGRES_PORT
+            value: "5432"
+          - name: POSTGRES_USER
+            value: backstage
+          - name: NODE_TLS_REJECT_UNAUTHORIZED
+            value: "0"
+          extraEnvVarsSecrets:
+          - backstage-secrets
+          extraVolumeMounts:
+          - mountPath: /etc/backstage/tls
+            name: tls-certs
+            readOnly: true
+          extraVolumes:
+          - name: tls-certs
+            secret:
+              secretName: backstage-tls-secret
+          image:
+            registry: ghcr.io
+            repository: abderraoufzekkour/devportal
+            tag: 1.0.51
+          livenessProbe:
+            httpGet:
+              path: /.backstage/health/v1/liveness
+              port: 7007
+              scheme: HTTPS
+          readinessProbe:
+            httpGet:
+              path: /.backstage/health/v1/readiness
+              port: 7007
+              scheme: HTTPS
+          startupProbe:
+            httpGet:
+              path: /.backstage/health/v1/liveness
+              port: 7007
+              scheme: HTTPS
+        ingress:
+          enabled: false
+        postgresql:
+          auth:
+            database: backstage
+            password: Backstage2026
+            username: backstage
+          enabled: true
+        service:
+          nodePorts:
+            backend: 30443
+          ports:
+            backend: 7007
+            name: tls-backend
+            targetPort: backend
+          type: NodePort
+    repoURL: https://backstage.github.io/charts
+    targetRevision: 2.8.2
