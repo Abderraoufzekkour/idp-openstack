@@ -192,11 +192,11 @@ spec:
               name: DevPortal
             permission:
               enabled: false
+            techdocs:
+              builder: 'local'
+              generator:
+                runIn: 'local'
           extraEnvVars:
-          - name: APP_CONFIG_techdocs_builder
-            value: 'local'
-          - name: APP_CONFIG_techdocs_generator_runIn
-            value: 'local'
           - name: POSTGRES_HOST
             value: devportal-postgresql
           - name: POSTGRES_PORT
