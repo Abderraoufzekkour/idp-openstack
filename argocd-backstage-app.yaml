@@ -32,6 +32,9 @@ spec:
             env:
             - name: DOCKER_TLS_CERTDIR
               value: ""
+            volumeMounts:
+            - name: docker-sock
+              mountPath: /var/run
           appConfig:
             app:
               baseUrl: https://197.140.32.65:30443
@@ -173,8 +176,6 @@ spec:
             permission:
               enabled: false
           extraEnvVars:
-          - name: DOCKER_HOST
-            value: tcp://localhost:2375
           - name: POSTGRES_HOST
             value: devportal-postgresql
           - name: POSTGRES_PORT
@@ -193,10 +194,14 @@ spec:
           - mountPath: /etc/backstage/tls
             name: tls-certs
             readOnly: true
+          - mountPath: /var/run
+            name: docker-sock
           extraVolumes:
           - name: tls-certs
             secret:
               secretName: backstage-tls-secret
+          - name: docker-sock
+            emptyDir: {}
           image:
             registry: ghcr.io
             repository: abderraoufzekkour/devportal
