@@ -20,32 +20,41 @@ spec:
         value: devportal-postgresql
       - name: backstage.extraEnvVars[1].name
         value: POSTGRES_PORT
+      - forceString: true
+        name: backstage.extraEnvVars[1].value
+        value: "5432"
       - name: backstage.extraEnvVars[2].name
         value: POSTGRES_USER
       - name: backstage.extraEnvVars[2].value
         value: backstage
       - name: backstage.extraEnvVars[3].name
         value: NODE_TLS_REJECT_UNAUTHORIZED
+      - forceString: true
+        name: backstage.extraEnvVars[3].value
+        value: "0"
       - name: backstage.extraEnvVars[4].name
         value: NODE_OPTIONS
       - name: backstage.extraEnvVars[4].value
         value: --no-node-snapshot
-      - forceString: true
-        name: backstage.extraEnvVars[1].value
-        value: "5432"
-      - forceString: true
-        name: backstage.extraEnvVars[3].value
-        value: "0"
-      - name: image.tag
-        value: 1.0.11
-      - forceString: true
-        name: backstage.extraEnvVars[5].name
+      - name: backstage.extraEnvVars[5].name
         value: NODE_ENV
       - forceString: true
         name: backstage.extraEnvVars[5].value
         value: development
+      - name: backstage.extraEnvVars[6].name
+        value: APP_CONFIG_techdocs_builder
+      - forceString: true
+        name: backstage.extraEnvVars[6].value
+        value: "local"
+      - name: backstage.extraEnvVars[7].name
+        value: APP_CONFIG_techdocs_generator_runIn
+      - forceString: true
+        name: backstage.extraEnvVars[7].value
+        value: "local"
       - name: imagePullSecrets[0].name
         value: ghcr-secret
+      - name: image.tag
+        value: 1.0.11
       releaseName: devportal
       values: |
         image:
@@ -192,21 +201,6 @@ spec:
               name: DevPortal
             permission:
               enabled: false
-            techdocs:
-              builder: 'local'
-              generator:
-                runIn: 'local'
-          extraEnvVars:
-          - name: POSTGRES_HOST
-            value: devportal-postgresql
-          - name: POSTGRES_PORT
-            value: "5432"
-          - name: POSTGRES_USER
-            value: backstage
-          - name: NODE_TLS_REJECT_UNAUTHORIZED
-            value: "0"
-          extraEnvVarsSecrets:
-          - backstage-secrets
           extraVolumeMounts:
           - mountPath: /etc/backstage/tls
             name: tls-certs
