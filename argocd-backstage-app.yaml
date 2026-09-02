@@ -24,18 +24,44 @@ spec:
           tag: 1.0.7
       valuesObject:
         backstage:
-          extraContainers:
-          - name: dind
-            image: docker:24-dind
-            securityContext:
-              privileged: true
-            env:
-            - name: DOCKER_TLS_CERTDIR
-              value: ""
-            volumeMounts:
-            - name: backstage-tmp
-              mountPath: /tmp
+          extraEnvVarsSecrets:
+          - backstage-secrets
+          extraVolumeMounts:
+          - mountPath: /etc/backstage/tls
+            name: tls-certs
+            readOnly: true
+          extraVolumes:
+          - name: tls-certs
+            secret:
+              secretName: backstage-tls-secret
+          extraEnvVars:
+          - name: POSTGRES_HOST
+            value: devportal-postgresql
+          - name: POSTGRES_PORT
+            value: "5432"
+          - name: POSTGRES_USER
+            value: backstage
+          - name: NODE_TLS_REJECT_UNAUTHORIZED
+            value: "0"
+          - name: NODE_OPTIONS
+            value: --no-node-snapshot
+          - name: NODE_ENV
+            value: development
           appConfig:
+            techdocs:
+              builder: 'external'
+              generator:
+                runIn: 'local'
+              publisher:
+                type: 'awsS3'
+                awsS3:
+                  bucketName: 'techdocs-b484d5e9-da36-4ac8-acab-22d5e7a5d77b'
+                  region: 'us-east-1'
+                  endpoint: 'http://rook-ceph-rgw-devportal-s3.rook-ceph.svc:80'
+                  s3ForcePathStyle: true
+                  credentials:
+                    accessKeyId: ${TECHDOCS_S3_ACCESS_KEY}
+                    secretAccessKey: ${TECHDOCS_S3_SECRET_KEY}
             app:
               baseUrl: https://197.140.32.65:30443
               enableExperimentalRedirectFlow: true
@@ -175,35 +201,6 @@ spec:
               name: DevPortal
             permission:
               enabled: false
-          extraEnvVars:
-          - name: DOCKER_HOST
-            value: tcp://127.0.0.1:2375
-          - name: POSTGRES_HOST
-            value: devportal-postgresql
-          - name: POSTGRES_PORT
-            value: "5432"
-          - name: POSTGRES_USER
-            value: backstage
-          - name: NODE_TLS_REJECT_UNAUTHORIZED
-            value: "0"
-          - name: NODE_OPTIONS
-            value: --no-node-snapshot
-          - name: NODE_ENV
-            value: development
-          extraEnvVarsSecrets:
-          - backstage-secrets
-          extraVolumeMounts:
-          - mountPath: /etc/backstage/tls
-            name: tls-certs
-            readOnly: true
-          - mountPath: /tmp
-            name: backstage-tmp
-          extraVolumes:
-          - name: tls-certs
-            secret:
-              secretName: backstage-tls-secret
-          - name: backstage-tmp
-            emptyDir: {}
           image:
             registry: ghcr.io
             repository: abderraoufzekkour/devportal
